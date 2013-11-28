@@ -37,7 +37,7 @@ Alguns conceitos básicos:
 - **Repositório**: diretório com arquivos "monitorados" - alterações são gravadas em lote, sequencialmente, criando um histórico.
 - **Commit**: alteração atômica de um ou mais arquivos.
 - **Merge**: ato de aplicar uma ou mais alterações ao repositório automaticamente
-- **Branch**: diferentes linhas de tempo - sequencias de commits podem ocorrem em "troncos" paralelos
+- **Branch**: diferentes linhas de tempo - sequencias de commits podem ocorrer em "troncos" paralelos
 - **Conflito**: quando alterações ocorrem no mesmo ponto de um arquivo - necessita intervenção manual
 
 Git
