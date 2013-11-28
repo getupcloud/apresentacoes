@@ -20,7 +20,9 @@ Como nossos antepassados desenvolviam seus projetos nos tempos das cavernas:
 10. ...e assim por diante, até alguém enfartar
 
 Agora, imagine uma equipe com varias pessoas (>1) editando o projeto e enviando arquivos
-por email, umas para as outras -> CAOS TOTAL!
+por email, umas para as outras.
+
+Resultado: **CAOS TOTAL!**
 
 - Cada alteração precisa ser aplicada manualmente.
 - Não existe histórico organizado das alterações.
