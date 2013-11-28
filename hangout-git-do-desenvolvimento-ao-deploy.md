@@ -531,7 +531,7 @@ Por padrão este remoto chama-se `origin`, por ser a origem do repositório loca
 
 ## OpenShift e os hooks de deploy ##
 
-Estamos utilizando neste tutorial um serviço de plataforma (PaaS) projetada para cuidar do deploy e aspectos gerencias da infraestrutura, abstraindo servidores, atualização de SO, isolamento de serviços e escalabilidade.
+Estamos utilizando neste tutorial um serviço de plataforma (PaaS) projetada para cuidar do deploy e aspectos gerenciais da infraestrutura, abstraindo servidores, atualização de SO, isolamento de serviços e escalabilidade.
 
 Neste ponto entram os hooks do git, nada mais do que scripts executados em diversos momentos do fluxo de desenvolvimento.
 
