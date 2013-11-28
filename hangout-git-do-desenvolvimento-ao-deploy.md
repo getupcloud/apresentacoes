@@ -567,7 +567,7 @@ Guarda arquivos que servem de flags para o sistema. Por exemplo, caso o arquivo 
 Como criamos uma aplicação php, temos um diretório `php/`, onde podemos desenvolver nosso projeto. O mesmo aplica-se para diferentes tipos de linguagens (python, ruby, nodejs, java, etc...), contudo cada linguagem apresenta uma estrutura ligeiramente diferente, baseado em seus padrões específicos.
 
 A partir de agora vamos utilizar este repositório como exemplo.
-A aplicação online pode ser acessada na url http://
+A aplicação online pode ser acessada na url http://myapp-[NAMESPACE].getup.io
 
 ## Branch ##
 
