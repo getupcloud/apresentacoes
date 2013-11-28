@@ -198,10 +198,11 @@ Anatomia de um commit:
 Depois de revisar visualmente as alterações podemos comitar:
 
 ```
-$ git commit -a -m Descrição melhorada"                 <--- a flag -a commita todas as alterações
+$ git commit -a -m Descrição melhorada"
 [master 01318aa] Descrição melhorada
  1 file changed, 2 insertions(+), 1 deletion(-)
 ```
+A flag `-a` commita todas as alterações da árvore, sem que seja necessário adicioná-las ao index com o comando `add`.
 
 Agora, inspecionando o log, vemos um novo commit:
 
@@ -254,7 +255,7 @@ $ git show 1fad7e
 $ git show 01318a
 ```
 
-Commits podem ser abreviados usando apenas seus números iniciais. Ao invés de `01318aac39fc5e660b28b42eee6dd5a3c382495e`, use `01318a`.
+Commits podem ser abreviados usando apenas seus identificadores iniciais. Ao invés de `01318aac39fc5e660b28b42eee6dd5a3c382495e`, use `01318a`.
 
 ## Árvore e índice ##
 
@@ -308,23 +309,9 @@ $ git diff
 
 Para descartar esta alteração podemos usar um dos sequintes métodos:
 
-1. Descartar o índice, mantendo a árvore intacta. Não nos serve agora pois não fizemos `add`
-
-```
-$ git reset
-```
-
-2. Descartar todas as alterações na árvore, voltando ao último commita do repositório
-
-```
-$ git reset --hard
-```
-
-3. Retornar arquivos específicos ao último commit
-
-```
-$ git checkout -- hello.php
-```
+1. `$ git reset`: Descartar o índice, mantendo a árvore intacta. Não nos serve agora pois não fizemos `add`
+2. `$ git reset --hard`: Descartar todas as alterações na árvore, voltando ao último commita do repositório
+3. `$ git checkout -- hello.php`: Retornar arquivos específicos ao último commit
 
 Visualmente temos:
 
@@ -445,20 +432,28 @@ para lá.
 
 Primeiro criamos uma aplicação no [dashboard web](https://broker.getupcloud.com). Caso você não possua uma conta na Getup, cadastre-se gratuitamente em [http://getupcloud.com](http://getupcloud.com).
 
-Toda aplicação disponibiliza uma GIT_URL para baixar o repositório, e apresenta o seguinte formato:
+Vou criar uma aplicação com o nome `myapp`. Toda aplicação disponibiliza uma *GIT_URL* para baixar o repositório, e apresenta o seguinte formato:
 
 ```
-ssh://UUID@APPNAME-NAMESPACE-getup.io/~/git/APPNAME.git/
+ssh://[UUID]@[APPNAME]-[NAMESPACE].getup.io/~/git/[APPNAME].git/
 ```
+
+Onde:
+
+- **[UUID]**: identificação única do gear da aplicação
+- **[APPNAME]**: nome da aplicação - compõe parte da URL HTTP
+- **[NAMESPACE]**: identificador único do usuário - compõe parte da URL HTTP
 
 O comando `clone` faz o download do repositório remoto:
 
 ```bash
-$ git clone <GIT_URL>
-$ cd <DIR>
+$ git clone ssh://[UUID]@myapp-caruccio.getup.io/~git/myapp.git/
+$ cd myapp/
 ````
 
-A partir desse ponto segue-se o fluxo *Edit -> Commit* normal.
+*Obs: `[UUID]` deve ser substituido pelo valor informado no momento da criação da aplicação.*
+
+A partir deste ponto segue o fluxo *Edit -> Commit* normal.
 
 Publicamos as alterações no repositório remoto usando o comando `push`:
 
@@ -480,6 +475,8 @@ A lista de repositórios remotos é acessível através do comando `remote`:
 
 ```bash
 $ git remote -v
+origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (fetch)
+origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (push)
 ```
 
 Podemos adicionar, editar e remover remotes a vontade. Uma finalidade é usar um remote para o código "live" e outro para backup.
@@ -488,15 +485,25 @@ Adicionar um repositório é simples:
 
 ```bash
 $ git remote add backup /tmp/backup/projeto.git
+````
+
+Agora temos dois remotos configurados em nosso repositório:
+
+```
+$ git remote -v
+backup	/tmp/backup/projeto.git (fetch)
+backup	/tmp/backup/projeto.git (push)
+origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (fetch)
+origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (push)
 ```
 
-Antes de enviar nossas alterações para o reposito de backup, vamos cloná-lo em `/tmp/backup/`:
+Antes de enviar nossas alterações para o repositório de backup, vamos cloná-lo em `/tmp/backup/`:
 
 ```bash
 $ mkdir /tmp/backup
 $ cd /tmp/backup
 $ git clone $OLDPWD --bare
-$ cd -
+$ ls -l
 ```
 
 A flag --bare clona apenas o repositório (dir .git/), sem a árvore, ideal para backups.
@@ -504,10 +511,12 @@ A flag --bare clona apenas o repositório (dir .git/), sem a árvore, ideal para
 Agora, de volta ao nosso repositório orignal, podemos alterar a árvore, comitar e fazer push para o novo remote:
 
 ```bash
+$ cd -
 $ git push backup
 ```
 
-O remote padrão é aquele que foi originalmente clonado, portanto não é necessário especificá no comando push.
+O remote padrão é aquele que foi originalmente clonado, portanto não é necessário especificá-lo no comando `push`.
+Por padrão este remoto chama-se `origin`, por ser a origem do repositório local.
 
 ## OpenShift e os hooks de deploy ##
 
@@ -529,6 +538,108 @@ Alguns exemplos comuns são:
 
 No OpenShift ambos os hooks pre-receive e post-receive são utilizados para controlar o deploy das aplicações, reiniciando serviços e notificando o
 resto do sistema.
+
+### Estrutura de nossa aplicação ###
+
+Uma aplicação OpenShift apresenta uma estrutura simples.
+
+- **.openshift/action_hooks/**
+
+Guarda scripts executados durante o build e deploy da aplicação no servidor (análogos aos hooks do .git).
+
+- **.openshift/markers/**
+
+Guarda arquivos que servem de flags para o sistema. Por exemplo, caso o arquivo `.openshift/markers/hot_deploy` exista durante o deploy, o sistema não realiza o restart da aplicação.
+
+- **php/** (Arquivos da aplicação)
+
+Como criamos uma aplicação php, temos um diretório `php/`, onde podemos desenvolver nosso projeto. O mesmo aplica-se para diferentes tipos de linguagens (python, ruby, nodejs, java, etc...), contudo cada linguagem apresenta uma estrutura ligeiramente diferente, baseado em seus padrões específicos.
+
+A partir de agora vamos utilizar este repositório como exemplo.
+A aplicação online pode ser acessada na url http://
+
+## Branch ##
+
+Um conceito largamente difundido em sistemas de controle de versão chama-se `branch`: um desvio do fluxo normal, com sua própria história, iniciado a partir de um commit pré-existente.
+
+Em outras palavras, usamos um branch para desenvolver paralelamente ao fluxo (branch) normal. Imagine a situação abaixo:
+
+```
+[ a ]<-----[ b ]<-----[ c ]
+```
+
+Onde `a` é o primeiro commit do repositório e `c`  o último. Dizemos que `a` é o "parent" (pai) de `b`. Isto é um branch, e no git este branch especificamente é chamado de `master`, por ser o primeiro e principal branch do repositório.
+
+De fato, o último commit de um branch possui um nome mais amigável, com significado (ao invés de 01318aac39fc5e660b28b42eee6dd5a3c382495e, por exemplo):
+
+```
+[ a ]<-----[ b ]<-----[ c ]<-----{ master }
+```
+
+Note que `{ master }` não é um commit, mas uma referência ao último commit de um branch.
+
+Suponha agora que vamos desenvolver uma nova feature para nosso projeto. Naturalmente abrimos os arquivos, editamos e comitamos. Esse até pode ser um bom caminho, mas em projetos onde existem mais desenvolvedores trabalhando podemos gerar conflitos desnecessários. Além disso, se nossas alterações forem mais longas, estaremos impedidos (moralmente) de enviar elas para o repositório remoto com frequencia, pois assim vamos publicar código incompleto.
+
+Novas features são normalmente desenvolvidas em branches exclusivos para elas, chamados *feature branch*.
+
+Primeiro, vamos descobrir em qual branch estamos com o comando `branch`:
+
+```
+$ git branch
+* master
+```
+
+Por enquanto temos apenas o branch `master`, e estamos usando-o nesse momento pois existe um `*` na frente dele.
+
+Antes de continuar, altera o arquivo `php/index.php` para o conteúdo abaixo.
+
+```php
+<!doctype html>
+<html lang="en">
+<body>
+<?php
+    date_default_timezone_set('America/Sao_Paulo');
+    
+    echo '<p>Bem-vindo ao hangout de Git.</p>';
+    echo '<hr>';
+    echo '<p>Acessado em ' . date('r') . '</p>';
+?>
+</body>
+</html>
+```
+
+Revise, comite e publique as alterações:
+
+```
+$ git diff
+$ git commit -a -m 'Mensagem de boas vindas'
+$ git push
+```
+As alterações já devem estar disponíveis na URL do app: http://myapp-[NAMESPACE].getup.io
+
+
+Agora vamos criar um novo branch chamado `formulario`:
+
+```
+$ git branch formulario
+```
+
+Apenas criar não nos transporta para este branch. Precisamos dizer explicitamente: agora quero mudar para o branch X:
+
+```
+$ git checkout formulario
+Switched to branch 'formulario'
+```
+
+Pronto, agora qualquer alteração no repositório será aplicada apenas no branch `formulario`, deixando o `master` intacto.
+
+
+
+
+
+
+
+
 
 
 ## Referências ##
