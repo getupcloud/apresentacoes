@@ -170,7 +170,7 @@ Conteúdo do arquivo **hello.php**:
 
 Após alterar um arquivo, este torna-se diferente do que aquele existente no repositório.
 Portanto, existe uma diferença entre o repositório e o arquivo editado.
-Para enxergar esta diferença usamod o comando `diff`:
+Para enxergar esta diferença usamos o comando `diff`:
 
 ```diff
 $ git diff                                              <--- diff mostra alterações não comitadas
@@ -432,7 +432,7 @@ para lá.
 
 Primeiro criamos uma aplicação no [dashboard web](https://broker.getupcloud.com). Caso você não possua uma conta na Getup, cadastre-se gratuitamente em [http://getupcloud.com](http://getupcloud.com).
 
-Vou criar uma aplicação com o nome `myapp`. Toda aplicação disponibiliza uma *GIT_URL* para baixar o repositório, e apresenta o seguinte formato:
+A titulo de exemplo, criarei uma aplicação chamada `myapp`. Toda aplicação disponibiliza uma *GIT_URL* para baixar o repositório, e apresenta o seguinte formato:
 
 ```
 ssh://[UUID]@[APPNAME]-[NAMESPACE].getup.io/~/git/[APPNAME].git/
@@ -444,14 +444,23 @@ Onde:
 - **[APPNAME]**: nome da aplicação - compõe parte da URL HTTP
 - **[NAMESPACE]**: identificador único do usuário - compõe parte da URL HTTP
 
-O comando `clone` faz o download do repositório remoto:
+A URL HTTP da aplicação apresenta o seguinte formato:
+
+```
+http://[APPNAME]-NAMESPACE].getup.io
+https://[APPNAME]-NAMESPACE].getup.io          <--- SSL wildcard já incluído
+```
+
+Como meu namespace é `caruccio`, esta aplicação será então http://myapp-caruccio.getup.io.
+
+Agora podemos baixar o código fonte. Usamo o comando `clone` para baixar o repositório remoto:
 
 ```bash
 $ git clone ssh://[UUID]@myapp-caruccio.getup.io/~git/myapp.git/
 $ cd myapp/
 ````
 
-*Obs: `[UUID]` deve ser substituido pelo valor informado no momento da criação da aplicação.*
+*Obs: `[UUID]` deve ser substituído pelo valor informado no momento da criação da aplicação.*
 
 A partir deste ponto segue o fluxo *Edit -> Commit* normal.
 
@@ -539,7 +548,7 @@ Alguns exemplos comuns são:
 No OpenShift ambos os hooks pre-receive e post-receive são utilizados para controlar o deploy das aplicações, reiniciando serviços e notificando o
 resto do sistema.
 
-### Estrutura de nossa aplicação ###
+### Estrutura da aplicação ###
 
 Uma aplicação OpenShift apresenta uma estrutura simples.
 
@@ -595,14 +604,10 @@ Antes de continuar, altera o arquivo `php/index.php` para o conteúdo abaixo.
 
 ```php
 <!doctype html>
-<html lang="en">
+<html>
 <body>
 <?php
-    date_default_timezone_set('America/Sao_Paulo');
-    
-    echo '<p>Bem-vindo ao hangout de Git.</p>';
-    echo '<hr>';
-    echo '<p>Acessado em ' . date('r') . '</p>';
+    echo '<p>Visitante, bem-vindo ao hangout de Git!</p>';
 ?>
 </body>
 </html>
@@ -615,32 +620,173 @@ $ git diff
 $ git commit -a -m 'Mensagem de boas vindas'
 $ git push
 ```
-As alterações já devem estar disponíveis na URL do app: http://myapp-[NAMESPACE].getup.io
 
+As alterações já devem estar disponíveis na URL do app (http://myapp-caruccio.getup.io).
 
-Agora vamos criar um novo branch chamado `formulario`:
+### Trabalhando com branchs ###
 
-```
-$ git branch formulario
-```
-
-Apenas criar não nos transporta para este branch. Precisamos dizer explicitamente: agora quero mudar para o branch X:
+Vamos incluir uma feature em nossa aplicação: permitir que o usuário informe seu nome. 
+Usaremos um branch específico para adicionar essa "feature". Podemos chamá-lo de "feature-name":
 
 ```
-$ git checkout formulario
-Switched to branch 'formulario'
+$ git branch feature-name
 ```
 
-Pronto, agora qualquer alteração no repositório será aplicada apenas no branch `formulario`, deixando o `master` intacto.
+Apenas a criação não nos transporta para este branch. Precisamos dizer explicitamente: *agora quero mudar para o branch X*:
 
+```bash
+$ git checkout feature-name
+Switched to branch 'feature-name'
 
+$ git branch
+* feature-name                            <----- agora estamos no branch form
+  master
+```
 
+Pronto, agora qualquer alteração no repositório será aplicada apenas no branch `form`, deixando o `master` intacto.
 
+Dica: Um atalho para criar e trocar para um novo branch é usar diretamente o comando `checkout` com a flag `-b`:
 
+```bash
+$ git checkout -b feature-name            <----- cria e muda para o novo branch
 
+$ git branch
+* feature-name
+  master
+```
 
+Edite o arquivo `php/index.php`e adicione as seguintes alterações:
 
+```php
+<!doctype html>
+<html>
+<body>
+<?php
+    if (array_key_exists('nome', $_REQUEST)) {
+        $nome = $_REQUEST['nome'];
+    } else {
+        $nome = 'Visitante';
+    }
 
+    echo '<p>' . $nome . ', bem-vindo ao hangout de Git!</p>';
+?>
+</body>
+</html>
+```
+
+Comite as alterações e inspecione o log:
+
+```
+$ git commit -a -m 'Mostra nome do visitante'
+
+$ git log
+commit 4741baed9ea1a3e155a2a5d4a01f762a0a128d1d              <----- nosso último commit (versão dinâmica)
+Author: Mateus Caruccio <mateus.caruccio@getupcloud.com>
+Date:   Thu Nov 28 15:28:44 2013 -0200
+
+    Mostra nome do visitante
+
+commit 9a1c8f8c8b55a803275af073367928d6b9c72673              <----- nosso primeiro commit (versão estática)
+Author: Mateus Caruccio <mateus.caruccio@getupcloud.com>
+Date:   Thu Nov 28 15:14:18 2013 -0200
+
+    Mensagem de boas vindas
+
+commit de2b8b673d98ab8b72fc09af93bca6e278ac3c12              <----- primeiro commit, veio com o template
+Author: Template builder <builder@example.com>
+Date:   Thu Nov 28 13:47:54 2013 +0000
+
+    Creating template
+```
+
+Lembre que ainda estamos no branch `feature-name`. Vamos incluir mais uma pequena alteração, para mostrar o nome do visitante *Capitalizado*:
+
+```diff
+diff --git php/index.php php/index.php
+index 05c0354..069ac1e 100644
+--- php/index.php
++++ php/index.php
+@@ -3,7 +3,7 @@
+ <body>
+ <?php
+     if (array_key_exists('nome', $_REQUEST)) {
+-        $nome = $_REQUEST['nome'];
++        $nome = ucwords($_REQUEST['nome']);
+     } else {
+         $nome = 'Visitante';
+     }
+```
+
+Altere o arquivo de acordo com o diff acima, comite e inspecione o log:
+
+```
+$ git commit -a -m 'Nome capitalizado'
+
+$ git log --oneline
+39ccb1c Nome capitalizado
+4741bae Mostra nome do visitante
+9a1c8f8 Mensagem de boas vindas
+de2b8b6 Creating template
+```
+
+Dica: a flag `--oneline` mostra os commits de forma comprimida, útil quando há muitos commits no branch.
+
+Agora vamos voltar para o branch master para aplicar estas alterações.
+
+```
+$ git checkout master
+$ git log --oneline
+9a1c8f8 Mensagem de boas vindas
+de2b8b6 Creating template
+```
+
+Veja como `master` está diferente de `feature-name`. Quando criamos o branch, partimos do segundo commit do `master`, e adicionamos dois commits somente em `feature-name`.
+
+Visualmente nosso repositório parece com o seguinte:
+
+```
+[ de2b8b6 ]<-----[ 9a1c8f8 ]<-----{ master }
+                      ^
+                      |
+                      |
+                      +----[ 4741bae ]<-----[ 39ccb1c ]<-----{ feature-name }
+```
+
+O que queremos agora é aplicar estes dois commit (`4741bae` e `39ccb1c`) em `master`. Para isso usamos o comando `merge`: 
+
+```
+$ git merge feature-name
+Updating 9a1c8f8..39ccb1c
+Fast-forward
+ php/index.php | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+```
+
+Inspecionando o log em `master` nos mostra:
+
+```
+$ git log --oneline
+39ccb1c Nome capitalizado
+4741bae Mostra nome do visitante
+9a1c8f8 Mensagem de boas vindas
+de2b8b6 Creating template
+```
+
+Agora nosso repositório parece com o seguinte:
+
+```
+[ de2b8b6 ]<-----[ 9a1c8f8 ]<-----[ 4741bae ]<-----[ 39ccb1c ]<-----{ master }
+                      ^
+                      |
+                      |
+                      +----[ 4741bae ]<-----[ 39ccb1c ]<-----{ feature-name }
+```
+
+Estamos prontos para publicar novamente nossa aplicação:
+
+```
+$ git push
+```
 
 ## Referências ##
 
