@@ -455,7 +455,7 @@ https://[APPNAME]-NAMESPACE].getup.io          <--- SSL wildcard já incluído
 
 Como meu namespace é `caruccio`, esta aplicação será então http://myapp-caruccio.getup.io.
 
-Agora podemos baixar o código fonte. Usamo o comando `clone` para baixar o repositório remoto:
+Agora podemos baixar o código fonte. Usamos o comando `clone` para baixar o repositório remoto:
 
 ```bash
 $ git clone ssh://[UUID]@myapp-caruccio.getup.io/~git/myapp.git/
