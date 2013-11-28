@@ -124,7 +124,7 @@ Conteúdo do arquivo **hello.php**:
 ?>
 ```
 
-Agora vamos incluir este arquivo ao repositório:
+Agora vamos incluir este arquivo no repositório:
 
 ```
 $ git add hello.php
