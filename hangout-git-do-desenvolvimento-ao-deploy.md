@@ -450,10 +450,10 @@ A URL HTTP da aplicação apresenta o seguinte formato:
 
 ```
 http://[APPNAME]-NAMESPACE].getup.io
-https://[APPNAME]-NAMESPACE].getup.io          <--- SSL wildcard já incluído
+https://[APPNAME]-NAMESPACE].getup.io          <--- SSL wildcard já incluso
 ```
 
-Como meu namespace é `caruccio`, esta aplicação será então http://myapp-caruccio.getup.io.
+Como meu namespace é `caruccio`, esta aplicação será acessível em http://myapp-caruccio.getup.io.
 
 Agora podemos baixar o código fonte. Usamos o comando `clone` para baixar o repositório remoto:
 
@@ -486,8 +486,8 @@ A lista de repositórios remotos é acessível através do comando `remote`:
 
 ```bash
 $ git remote -v
-origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (fetch)
-origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (push)
+origin	ssh://528bd5fd99fc7721b90002f3@myapp-caruccio.getup.io/~/git/myapp.git/ (fetch)
+origin	ssh://528bd5fd99fc7721b90002f3@myapp-caruccio.getup.io/~/git/myapp.git/ (push)
 ```
 
 Podemos adicionar, editar e remover remotes a vontade. Uma finalidade é usar um remote para o código "live" e outro para backup.
@@ -504,8 +504,8 @@ Agora temos dois remotos configurados em nosso repositório:
 $ git remote -v
 backup	/tmp/backup/projeto.git (fetch)
 backup	/tmp/backup/projeto.git (push)
-origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (fetch)
-origin	ssh://528bd5fd99fc7721b90002f3@wordpress-caruccio.getup.io/~/git/wordpress.git/ (push)
+origin	ssh://528bd5fd99fc7721b90002f3@myapp-caruccio.getup.io/~/git/myapp.git/ (fetch)
+origin	ssh://528bd5fd99fc7721b90002f3@myapp-caruccio.getup.io/~/git/myapp.git/ (push)
 ```
 
 Antes de enviar nossas alterações para o repositório de backup, vamos cloná-lo em `/tmp/backup/`:
@@ -641,11 +641,11 @@ $ git checkout feature-name
 Switched to branch 'feature-name'
 
 $ git branch
-* feature-name                            <----- agora estamos no branch form
+* feature-name                            <----- agora estamos no branch feature-name
   master
 ```
 
-Pronto, agora qualquer alteração no repositório será aplicada apenas no branch `form`, deixando o `master` intacto.
+Pronto, agora qualquer alteração no repositório será aplicada apenas no branch `feature-name`, deixando o `master` intacto.
 
 Dica: Um atalho para criar e trocar para um novo branch é usar diretamente o comando `checkout` com a flag `-b`:
 
