@@ -2,7 +2,7 @@
 
 Hangout realizado em 28/11/2013.
 
-Assista ao video em nosso [canal do youtube](http://www.youtube.com/channel/UCF8LFCqMG_t_arG5LMQY5uw)
+Assista ao video em nosso [canal do youtube](http://www.youtube.com/user/getupcloud)
 
 ## Introdução ##
 
