@@ -1,7 +1,7 @@
 Webinar Kubernetes e OpenShift — Build e Deploy Avançado
 ========================================================
 
-Vídeo e post em 
+Vídeo e blog post em https://blog.getupcloud.com/webinar-kubernetes-e-openshift-build-e-deploy-avan%C3%A7ado-725d21b83036
 
 Docker
 -------
